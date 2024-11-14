@@ -7,7 +7,7 @@ export function makeSequences(
   sequenceLength = 5
 ) {
   const pointIndicesByLabel = new Map<string, number[]>();
-  points.forEach((point, index) => {
+  points.forEach((_, index) => {
     const label = metadata[index].label!;
     const pointIndices = pointIndicesByLabel.get(label) || [];
     pointIndices.push(index);

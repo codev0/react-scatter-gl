@@ -95,7 +95,7 @@ export function generatePointPositionArray(dataset: Dataset): Float32Array {
   const positions = new Float32Array(dataset.points.length * 3);
   let dst = 0;
 
-  dataset.points.forEach((d, i) => {
+  dataset.points.forEach((_, i) => {
     const vector = dataset.points[i];
 
     positions[dst++] = utils.scaleLinear(vector[0], xExtent, xScale);
