@@ -1,16 +1,13 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { data } from "./data";
-import { PlotPoints } from "./plot-points";
 import { createDataset, Dataset, Point3D, PointMetadata } from "./scatter";
-import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
-import { BufferGeometry, Group, LineBasicMaterial, Vector3, Line } from "three";
-// import { BufferGeometry } from "three/src/core/BufferGeometry.ts";
-// import { Group } from "three/src/objects/Group.ts";
-// import { LineBasicMaterial } from "three/src/materials/LineBasicMaterial.ts";
-// import { Vector3 } from "three/src/math/Vector3.ts";
-// import { Line } from "three/src/objects/Line.ts";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { BufferGeometry, LineBasicMaterial, Vector3, Line } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { Nav } from "./nav";
+import { AppProvider } from "./app-provider";
+// import { PlotPoints } from "./plot-points";
+import { ScatterPoints } from "./scatter-points";
 
 function CustomOrbitControls() {
   const { camera, gl } = useThree(); // Access camera and renderer
@@ -77,19 +74,6 @@ function AxisLines() {
   );
 }
 
-function Rotator({ children }: { children: ReactNode }) {
-  const groupRef = useRef<Group>(null);
-
-  useFrame(() => {
-    if (groupRef.current) {
-      groupRef.current.rotation.x = 0.01; // Small tilt on the x-axis
-      groupRef.current.rotation.y += 0.001; // Autorotate around y-axis
-    }
-  });
-
-  return <group ref={groupRef}>{children}</group>;
-}
-
 function App() {
   const [dataset, setDataset] = useState<Dataset | null>(null);
   const handleAddPoints = () => {
@@ -107,7 +91,7 @@ function App() {
       setDataset(createDataset(dataPoints, metadata));
     }
   };
-  
+
   return (
     <div
       id="canvas-container"
@@ -117,9 +101,7 @@ function App() {
       }}
     >
       <Nav
-        onAddPoints={() => {
-          handleAddPoints();
-        }}
+        onAddPoints={handleAddPoints}
         onRemovePoints={() => {
           setDataset(null);
         }}
@@ -131,14 +113,14 @@ function App() {
           far: 1000,
         }}
       >
-        <ambientLight />
-        <AxisLines />
-        <axesHelper args={[5]} />
-        <CustomOrbitControls />
-        <Rotator>
+        <AppProvider dataset={dataset}>
+          <ambientLight />
+          {/* <axesHelper args={[5]} /> */}
           <gridHelper args={[2, 2]} />
-          <PlotPoints dataset={dataset} />
-        </Rotator>
+          {dataset ? <ScatterPoints /> : null}
+          {/* <PlotPoints dataset={dataset} /> */}
+          <AxisLines />
+        </AppProvider>
       </Canvas>
     </div>
   );
