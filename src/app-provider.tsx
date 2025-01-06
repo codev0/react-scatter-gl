@@ -30,36 +30,12 @@ export const AppProvider = ({
 
     const positions = generatePointPositionArray(dataset);
 
-    const pickingColors = new Float32Array(dataset?.points.length * 3);
-    const visibleColors = new Float32Array(dataset?.points.length * 3).fill(0);
-
-    // Set purple color for all visible points
-    const purpleColor = new Color("#800080");
-
-    dataset?.points.forEach((point, i) => {
-      // Generate unique color for picking
-      const id = i + 1;
-      const r = (id & 0xff) / 255;
-      const g = ((id >> 8) & 0xff) / 255;
-      const b = ((id >> 16) & 0xff) / 255;
-
-      pickingColors[i * 3] = r;
-      pickingColors[i * 3 + 1] = g;
-      pickingColors[i * 3 + 2] = b;
-
-      // Set visible color (purple)
-      visibleColors[i * 3] = purpleColor.r;
-      visibleColors[i * 3 + 1] = purpleColor.g;
-      visibleColors[i * 3 + 2] = purpleColor.b;
-    });
-
     return {
       positions,
-      pickingColors,
-      visibleColors,
       length: dataset.points.length,
     };
   }, [dataset]);
+
   return (
     <AppContext.Provider
       value={{

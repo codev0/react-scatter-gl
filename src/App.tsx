@@ -74,22 +74,65 @@ function AxisLines() {
   );
 }
 
+export const getDataset = (cursor: number, limit: number) => {
+  const dataPoints: Point3D[] = [];
+  const metadata: PointMetadata[] = [];
+  // data.projection.forEach((vector, index) => {
+  //   const labelIndex = data.labels[index];
+  //   dataPoints.push(vector);
+  //   metadata.push({
+  //     labelIndex,
+  //     label: data.labelNames[labelIndex],
+  //   });
+  // });
+  const start = cursor * limit;
+
+  if (start >= data.projection.length) return { dataPoints, metadata };
+
+  for (let i = start; i < start + limit; i++) {
+    const vector = data.projection[i];
+    const labelIndex = data.labels[i];
+    dataPoints.push(vector);
+    metadata.push({
+      labelIndex,
+      label: data.labelNames[labelIndex],
+    });
+  }
+
+  return { dataPoints, metadata };
+};
+
 function App() {
   const [dataset, setDataset] = useState<Dataset | null>(null);
+  const [cursor, setCursor] = useState(0);
   const handleAddPoints = () => {
-    if (!dataset) {
-      const dataPoints: Point3D[] = [];
-      const metadata: PointMetadata[] = [];
-      data.projection.forEach((vector, index) => {
-        const labelIndex = data.labels[index];
-        dataPoints.push(vector);
-        metadata.push({
-          labelIndex,
-          label: data.labelNames[labelIndex],
-        });
-      });
-      setDataset(createDataset(dataPoints, metadata));
-    }
+    const { dataPoints, metadata } = getDataset(cursor, 100);
+    setCursor(cursor + 1);
+    setDataset((state) => {
+      if (dataPoints.length === 0) return state;
+      if (!state) {
+        return createDataset(dataPoints, metadata);
+      }
+      return {
+        points: [...state.points, ...dataPoints],
+        metadata: [...state.metadata, ...metadata],
+        dimensions: 3,
+      };
+    });
+  };
+
+  const handleRemovePoints = () => {
+    setDataset((state) => {
+      if (!state) return null;
+      const n = state.points.length;
+      const m = 100;
+      if (n <= m) return null;
+      return {
+        points: state.points.slice(0, n - m),
+        metadata: state.metadata.slice(0, n - m),
+        dimensions: 3,
+      };
+    });
   };
 
   return (
@@ -100,12 +143,7 @@ function App() {
         height: "100vh",
       }}
     >
-      <Nav
-        onAddPoints={handleAddPoints}
-        onRemovePoints={() => {
-          setDataset(null);
-        }}
-      />
+      <Nav onAddPoints={handleAddPoints} onRemovePoints={handleRemovePoints} />
       <Canvas
         camera={{
           position: [0.5, 0.5, 0.5], // Position along x, y, and z at 45 degrees

@@ -33,7 +33,6 @@ export const PlotPoints: FC<{
   const { hoverPointIndex, worldSpacePointPositions } = useAppContext();
   const [hoveredPoint, setHoveredPoint] = useState<number | null>(null);
   const renderMaterialRef = useRef(createRenderMaterial(5.0));
-
   const pickingMaterialRef = useRef(createPickingMaterial(5.0));
   const pickingScene = useMemo(() => new Scene(), []);
   const pickingTarget = useMemo(() => {
