@@ -8,8 +8,6 @@ export const AppContext = createContext<
       setHoverPointIndex: (index: number | null) => void;
       points: {
         positions: Float32Array;
-        pickingColors: Float32Array;
-        visibleColors: Float32Array;
         length: number;
       };
       dataset: Dataset | null;
